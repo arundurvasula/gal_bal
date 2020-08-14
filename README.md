@@ -49,3 +49,7 @@ Recombination rate =  3.133483e-06 (BYxRM linkage mapping)
 mutation rate = 3.8e-10
 
 number of generations = 3.2 billion.
+
+#### Notes:
+
+To set the generation time as a variable, see here: https://groups.google.com/forum/#!topic/slim-discuss/0jOCti_t380
