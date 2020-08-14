@@ -30,8 +30,6 @@ make slim
 
 ## Parameters for simulations ##
 
-Total generationns = 3.2 billion 
-
 ### Introgression simulation
 
 4N until MRCA of all S .cerevisae. 
