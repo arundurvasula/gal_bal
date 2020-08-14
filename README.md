@@ -53,3 +53,5 @@ number of generations = 3.2 billion.
 #### Notes:
 
 To set the generation time as a variable, see here: https://groups.google.com/forum/#!topic/slim-discuss/0jOCti_t380
+
+Use `-t` and `-m` to benchmark time and memory from the command line.
