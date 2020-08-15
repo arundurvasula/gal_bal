@@ -46,6 +46,8 @@ Selfing rate = 1/50,000 (Kruglyak NG)
 
 Clonning rate = 1/50,000 (use instead of selfing rate)
 
+Gene conversion rate = (this is probably what yeast uses for the most part)
+
 Recombination rate =  3.133483e-06 (BYxRM linkage mapping)
 
 mutation rate = 3.8e-10
