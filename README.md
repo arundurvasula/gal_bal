@@ -30,18 +30,28 @@ make slim
 
 ## Parameters for simulations ##
 
-Total generationns = 3.2 billion 
-
 ### Introgression simulation
 
 4N until MRCA of all S .cerevisae. 
+
 Ne = 10,000,000
+
 migration rate - m uniform(0,1)
+
 talpha = uniform(0,40,000,000)
 
 ### Fixed parameters
 
 Selfing rate = 1/50,000 (Kruglyak NG)
-Recombination rate = 9e-09 (BYxRM linkage mapping)
+
+Recombination rate =  3.133483e-06 (BYxRM linkage mapping)
+
 mutation rate = 3.8e-10
+
 number of generations = 3.2 billion.
+
+#### Notes:
+
+To set the generation time as a variable, see here: https://groups.google.com/forum/#!topic/slim-discuss/0jOCti_t380
+
+Use `-t` and `-m` to benchmark time and memory from the command line.
