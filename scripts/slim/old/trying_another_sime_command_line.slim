@@ -1,0 +1,120 @@
+// set up a simple neutral simulation
+initialize() {
+	//initializeMutationRate(1e-7);
+	factor = 20000;
+	//defineConstant("mu",3.8e-10)
+	defineConstant("s",
+	initializeMutationRate(3.8e-10 * factor); 
+	initializeMutationType("m4", 0.5, "f", 0.0); // neutral 
+	initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+
+// gal7
+	initializeMutationType("m2", 0.5, "f", 0.1); // beneficial in p1 
+	initializeMutationType("m3", 0.5, "f", 0.1); // beneficial in p2 
+	
+	// m1 mutation type: neutral
+	//initializeMutationType("m1", 0.5, "f", 0.0);
+	recomb_rate = 9e-09 * factor;
+
+	// g1 genomic element type: uses m1 for all mutations
+	initializeGenomicElementType("g1", m4, 1.0);
+	
+	// uniform chromosome of length 100 kb with uniform recombination
+	initializeGenomicElement(g1, 0, 20000);
+	initializeRecombinationRate(recomb_rate);
+}
+
+// create a population of 500 individuals
+1 {
+	print("HERE2");
+	sim.addSubpop("p1", 1000); 
+//p1.setCloningRate(0.8);
+sim.addSubpop("p2", 1000); 
+//p2.setCloningRate(0.8);
+p1.setSelfingRate(0.99);
+p2.setSelfingRate(0.99);
+
+p1.setMigrationRates(p2, 0.02);
+p2.setMigrationRates(p1, 0.02);
+}
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+
+
+1 late(){
+
+//print("HERE");
+
+
+//sim.readFromPopulationFile("/Users/jamesboocock/Dropbox/PHDTHESIS/projects/slim_gal/scripts/slim_out_test+30000000.txt");
+//	infile = readFile("/Users/jamesboocock/Dropbox/PHDTHESIS/projects/slim_gal/scripts/positions.txt");
+	
+	p1.genomes[1:2].addNewDrawnMutation(m2,10000);
+ 		//count.addNewDrawnMutation(m1,10);
+	//	count.addNewDrawnMutation(m1,9999);
+
+ //}
+ //print(count);
+ 
+//ample(p1.genomes, 10000).addNewDrawnMutation(m2, 10000);
+sample(p2.genomes, 1000).addNewDrawnMutation(m3, 10000);
+
+ sim.outputFull(filePath="~/test.txt",ages=T);
+
+}
+10 late(){
+	 sim.outputFull(filePath="~/test2.txt",ages=T);
+
+}
+
+// Dominant model
+fitness(m2, p2) { 
+	factor = 1000;
+
+			if(genome1.countOfMutationsOfType(m2) & genome2.countOfMutationsOfType(m2)){
+				return  0.5 *factor;
+				}
+				return 1.0;
+}
+// Dominant model
+
+fitness(m2, p1) { 
+	factor = 1000;
+
+			if(genome1.countOfMutationsOfType(m2) | genome2.countOfMutationsOfType(m2)){
+				return 2.0 * factor;
+				}
+				return 1.0;
+}
+// Dominant model
+
+
+fitness(m3, p2) { 
+	factor = 1000;
+
+			if(genome1.countOfMutationsOfType(m3) | genome2.countOfMutationsOfType(m3)){
+				return 2.0 * factor;
+				}
+				return 1.0;
+}
+
+fitness(m3, p1) { 
+
+	factor = 1000;
+
+			if(genome1.countOfMutationsOfType(m3) & genome2.countOfMutationsOfType(m3)){
+				return 0.5 * factor;
+				}
+				return 1.0;
+}
+
+100000 late() {
+ sim.outputFull(filePath="~/test2.txt",ages=T);
+ 	sim.outputMutations(sim.mutations,filePath="~/mutations_wtf.txt");
+
+}
+10000 late(){
+	sim.outputMutations(sim.mutations,filePath="~/mutations.txt");
+	 sim.outputFull(filePath="~/test4.txt",ages=T);
+
+}

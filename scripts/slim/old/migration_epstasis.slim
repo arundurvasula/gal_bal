@@ -1,0 +1,150 @@
+initialize() { 
+initializeMutationRate(1e-7); 
+initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+
+// gal7
+initializeMutationType("m2", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m3", 0.5, "f", 0.1); // beneficial in p2 
+initializeGenomicElementType("g1", c(m1), 1.0);
+initializeGenomicElementType("g2", c(m1), 1.0); 
+initializeGenomicElementType("g3", c(m1), 1.0); 
+ 
+ 
+//. pgm1
+initializeMutationType("m4", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m5", 0.5, "f", 0.1); // beneficial in p2 
+
+// gal2
+ 
+initializeMutationType("m6", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m7", 0.5, "f", 0.1); // beneficial in p2  
+ 
+ 
+m2.convertToSubstitution = F;
+m3.convertToSubstitution = F;
+initializeGenomicElement(g1, 0, 20000); 
+
+initializeGenomicElement(g2, 20001, 40000); 
+initializeGenomicElement(g3, 40001, 60000); 
+
+rates = c(rep(c(1e-7, 0.5),2),1e-7);
+print(rates);
+defineConstant("C", 10);
+// number of QTLs
+defineConstant("W", 1000);
+
+
+ends = (repEach(c(10000,30000,50000) + 10000,2) +  rep(c(0,1), 3))[0:4];
+print(ends);
+initializeRecombinationRate(rates,ends);
+
+} 
+1 {
+sim.addSubpop("p1", 1000); 
+sim.addSubpop("p2", 1000); 
+
+p1.setMigrationRates(p2, 0.01);
+p2.setMigrationRates(p1, 0.01);
+}
+// recriprocal migration.
+1 late() { 
+	
+	//sample(p1.genomes, 1000).addNewDrawnMutation(m3, 10000); // add A 
+	sample(p2.genomes, 1000).addNewDrawnMutation(m3, 10000); // add A 
+	sample(p2.genomes, 1000).addNewDrawnMutation(m5, 30000); // add A 
+	sample(p2.genomes, 1000).addNewDrawnMutation(m7, 50000); // add A 
+
+	sample(p1.genomes, 1000).addNewDrawnMutation(m2, 10000); // add A 
+	sample(p1.genomes, 1000).addNewDrawnMutation(m4, 30000); // add A 
+	sample(p1.genomes, 1000).addNewDrawnMutation(m6, 50000); // add A 
+	
+		
+	
+}
+
+// gal7 (cBS)
+fitness(m2, p1) { 
+	if (genome1.countOfMutationsOfType(m4)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+} 
+fitness(m2, p2) {
+	return 1.0;
+} 
+
+
+//gal7 (by)
+fitness(m3, p1) { 
+	return 1.0;
+} 
+fitness(m3, p2) { 
+	return 1.0; 
+} 
+
+
+// pgm1 (cbs)
+fitness(m4, p1) { 
+	if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+
+
+ } 
+ 
+ // always a disadvantage in P2
+fitness(m4, p2) { 
+			return 0.8;
+} 
+
+
+// no epistasis yet
+
+// pgm1 (by)
+fitness(m5, p1) { 
+if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 0.8;
+		}
+	}
+	return 1.0;
+} 
+fitness(m5, p2) {
+	return 1.2;
+ } 
+
+// gal2 (cbs)
+
+fitness(m6, p2) { 
+if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m4)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+
+ } 
+ 
+ 
+fitness(m6, p2) { 
+	return 1.0;
+ } 
+ 
+ // gal2 (by)
+fitness(m7, p2) {
+	return 1.0;
+
+} 
+fitness(m7, p2) { 
+	return 1.0;
+ } 
+
+
+
+
+100000 { sim.simulationFinished(); }

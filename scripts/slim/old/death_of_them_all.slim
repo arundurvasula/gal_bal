@@ -1,0 +1,50 @@
+// set up a simple neutral simulation
+initialize() {
+	initializeMutationRate(1e-7);
+	factor = 1000;
+	initializeMutationRate(3.8e-10 * factor); 
+	initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+
+// gal7
+	initializeMutationType("m2", 0.5, "f", 0.1); // beneficial in p1 
+	initializeMutationType("m3", 0.5, "f", 0.1); // beneficial in p2 
+	
+	// m1 mutation type: neutral
+	//initializeMutationType("m1", 0.5, "f", 0.0);
+	recomb_rate = 9e-07 * factor;
+
+	// g1 genomic element type: uses m1 for all mutations
+	initializeGenomicElementType("g1", m1, 1.0);
+	
+	// uniform chromosome of length 100 kb with uniform recombination
+	initializeGenomicElement(g1, 0, 20000);
+	initializeRecombinationRate(recomb_rate);
+}
+
+// create a population of 500 individuals
+1 {
+}
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+1 late(){
+ sim.readFromPopulationFile("/Users/jamesboocock/Dropbox/PHDTHESIS/projects/slim_gal/scripts/slim_out_test.txt");
+}
+
+fitness(m2, p1) { 
+	if (genome1.countOfMutationsOfType(m4)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 1.2;
+		}
+	}
+	if (genome1.countOfMutationsOfType(m5)){
+			return 0.8;
+	}
+	return 1.0;
+} 
+fitness(m2, p2) {
+	if (genome1.countOfMutationsOfType(m5)){
+			return 0.9;
+	}
+			return 0.99;
+	//return 1.0;
+} 

@@ -1,0 +1,260 @@
+// We want to parametrize this whole simulation 
+// Fit:
+// Array of 8 with selection coeffcients. 
+// Alt alt alt -> cheese -> +++  S _alt S_alt S_alt
+// ref ref ref -> vineyard -> +++  S_ref S_ref S_ref
+// Alt ref alt -> cheese -> --- 
+// Migration rate.
+// scaling factor 
+//
+// Fix:
+// selfing rate 1/50000 
+// recombination rate 
+// mutation rate
+// pop size 
+// Number of generation 3.88 billion. 
+
+// Simulation 2 introgression + neutral
+// 
+// pulse model single generation event.
+// 
+// migration rate - m
+// T_alpha - which generation it is gonna happen inn.
+// 
+// Fix:
+// selfing rate 1/50000 
+// recombination rate 
+// mutation rate
+// pop size 
+
+// Simulation 3 introgression  + Balancing selection 
+//
+// P1,P2 (cheese), and P3 (fix alt alt alt)
+// T alpha -> simulation 1 starts.
+// 
+
+// Statistics 
+// eLD 
+// dS 
+// PI - need good variants for the entire region. 
+// sequence identity of region we would need to rethink model.
+
+// Simulation 4 ++++
+// Length - probability of NS and S. 
+// Which mutations??? 
+// Notes: 10s 100,000s of simulations 
+
+
+// qsub -t 1:100000:1 slim_intro.sh
+// qssub -t  
+// draw parametrs from prior
+// run slim sims | R abc format. 
+// parallel -j 8 "bash slim_intro.sh {}" :::  
+
+
+
+initialize() { 
+factor = 20000;
+initializeMutationRate(3.8e-10 * factor); 
+initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+
+// gal7
+initializeMutationType("m2", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m3", 0.5, "f", 0.1); // beneficial in p2 
+initializeGenomicElementType("g1", c(m1), 1.0);
+initializeGenomicElementType("g2", c(m1), 1.0); 
+initializeGenomicElementType("g3", c(m1), 1.0); 
+ 
+ 
+//. pgm1
+initializeMutationType("m4", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m5", 0.5, "f", 0.1); // beneficial in p2 
+
+// gal2
+ 
+initializeMutationType("m6", 0.5, "f", 0.1); // beneficial in p1 
+initializeMutationType("m7", 0.5, "f", 0.1); // beneficial in p2  
+ 
+ 
+m2.convertToSubstitution = F;
+m3.convertToSubstitution = F;
+initializeGenomicElement(g1, 0, 20000); 
+
+initializeGenomicElement(g2, 20001, 40000); 
+initializeGenomicElement(g3, 40001, 60000); 
+
+recomb_rate = 9e-09;
+//rates = c(rep(c(1e-7, 0.5),2),1e-7);
+rates = c(rep(c(recomb_rate  * factor, 0.5),2),recomb_rate * factor);
+print(rates);
+print(rates);
+defineConstant("C", 10);
+// number of QTLs
+defineConstant("W", 1000);
+
+
+ends = (repEach(c(10000,30000,50000) + 10000,2) +  rep(c(0,1), 3))[0:4];
+print(ends);
+initializeRecombinationRate(rates,ends);
+
+} 
+1 {
+	print("HERE2");
+	sim.addSubpop("p1", 1000); 
+//p1.setCloningRate(0.8);
+sim.addSubpop("p2", 1000); 
+//p2.setCloningRate(0.8);
+p1.setSelfingRate(0.9);
+p2.setSelfingRate(0.9);
+
+p1.setMigrationRates(p2, 0.05);
+p2.setMigrationRates(p1, 0.05);
+}
+// recriprocal migration.
+1 late() { 
+	
+
+
+
+	test = sample(p1.genomes, 2000);
+	test.addNewDrawnMutation(m2,10000);
+	test.addNewDrawnMutation(m4,30000);
+	test.addNewDrawnMutation(m6,50000);
+	//.addNewDrawnMutation(m2, 10000); // add A 
+	//sample(p1.genomes, 2000).addNewDrawnMutation(m4, 30000); // add A 
+	//sample(p1.genomes, 2000).addNewDrawnMutation(m6, 50000); // add A 
+	
+		
+		sample(p2.genomes, 2000).addNewDrawnMutation(m3, 10000); // add A 
+	//sample(p2.genomes, 2000).addNewDrawnMutation(m3, 10000); // add A 
+	sample(p2.genomes, 2000).addNewDrawnMutation(m5, 30000); // add A 
+	sample(p2.genomes, 2000).addNewDrawnMutation(m7, 50000); // add A 
+}
+
+// gal7 (cbs)
+fitness(m2, p1) { 
+	if (genome1.countOfMutationsOfType(m4)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+} 
+fitness(m2, p2) {
+if (genome1.countOfMutationsOfType(m4)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 0.8;
+		}
+	}
+	return 1.0;
+} 
+
+
+
+fitness(m3, p1) { 
+if (genome1.countOfMutationsOfType(m5)){
+		if(genome1.countOfMutationsOfType(m7)){
+			return 0.8;
+		}
+	}
+	return 1.0;
+} 
+fitness(m3, p2) { 
+if (genome1.countOfMutationsOfType(m5)){
+		if(genome1.countOfMutationsOfType(m7)){
+			return 1.2;
+		}
+	}
+	return 1.0; 
+} 
+
+fitness(m4, p1) { 
+		if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 1.2;
+		}
+		
+	}
+	return 1.0;
+
+
+ } 
+fitness(m4, p2) { 
+	if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m6)){
+			return 0.8;
+		}
+	}
+	return 1.0; } 
+
+fitness(m5, p1) { 
+if (genome1.countOfMutationsOfType(m3)){
+		if(genome1.countOfMutationsOfType(m7)){
+			return 0.8;
+		}
+	}if (genome1.countOfMutationsOfType(m2)){
+			if(genome1.countOfMutationsOfType(m6)){
+				return 0.4;
+		}
+	}
+	return 1.0;
+} 
+fitness(m5, p2) {
+if (genome1.countOfMutationsOfType(m3)){
+		if(genome1.countOfMutationsOfType(m7)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+ } 
+
+fitness(m6, p2) { 
+if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m4)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+
+ } 
+fitness(m6, p2) { 
+
+if (genome1.countOfMutationsOfType(m2)){
+		if(genome1.countOfMutationsOfType(m4)){
+			return 0.8;
+		}
+	}
+	return 1.0;
+ } 
+fitness(m7, p2) {
+	if (genome1.countOfMutationsOfType(m3)){
+		if(genome1.countOfMutationsOfType(m5)){
+			return 0.8;
+		}
+	}
+	return 1.0;
+
+
+ } 
+fitness(m7, p2) { 
+
+if (genome1.countOfMutationsOfType(m3)){
+		if(genome1.countOfMutationsOfType(m5)){
+			return 1.2;
+		}
+	}
+	return 1.0;
+ } 
+
+
+
+100000 late() {
+	sim.outputFull(filePath="~/test_full_epi.txt",ages=T);
+	sim.outputMutations(sim.mutationsOfType(m1),	filePath="~/test_mut.txt");
+}
+
+10000 late(){
+	sim.outputMutations(sim.mutations,filePath="~/mutationsepi.txt");
+	 sim.outputFull(filePath="~/test_epistasis.txt",ages=T);
+
+}
