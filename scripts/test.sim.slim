@@ -6,8 +6,8 @@ mutation_rate = 3.8e-10 * factor;
 recombination_rate = 3.133483e-06 * factor;
 initializeMutationRate(mutation_rate);
 initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
-defineConstant("selfing_rate", 0.7647214872325534);
-defineConstant("cloning_rate", 0.23527351276744662);
+defineConstant("selfing_rate", 0.3533951166967956);
+defineConstant("cloning_rate", 0.6465998833032044);
 // gal7
 initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
 initializeMutationType("m3", 0.5, "f", 0.0); // beneficial in p2 
@@ -43,7 +43,6 @@ late(){
 }
 // create a population of 500 individuals
 1 late(){
-	print(selfing_rate);
 	sim.addSubpop("p1", asInteger(10e6/factor));
 	sim.addSubpop("p2", asInteger(10e6/factor));
 }
@@ -56,17 +55,15 @@ late(){
 	//p1.genomes.addNewDrawnMutation(m3,30000);
 	//p1.genomes.addNewDrawnMutation(m4,50000);
 	//p1.add
-	
 	p1.genomes.addNewDrawnMutation(m2,5000);
 	p1.genomes.addNewDrawnMutation(m3,15000);
 	p1.genomes.addNewDrawnMutation(m4,25000);
-    sim.outputFull(filepath="burn_in.txt");
 }
-268157{
-	p2.setMigrationRates(p1,0.2843962346301684);
+223703{
+	p2.setMigrationRates(p1,0.3248444778482505);
 	
 }
-268158{
+223704{
 	p2.setMigrationRates(p1,0);
 }
 

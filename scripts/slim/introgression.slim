@@ -43,7 +43,6 @@ late(){
 }
 // create a population of 500 individuals
 1 late(){
-	print(selfing_rate);
 	sim.addSubpop("p1", asInteger(10e6/factor));
 	sim.addSubpop("p2", asInteger(10e6/factor));
 }
@@ -56,11 +55,9 @@ $burnin late(){
 	//p1.genomes.addNewDrawnMutation(m3,30000);
 	//p1.genomes.addNewDrawnMutation(m4,50000);
 	//p1.add
-	
 	p1.genomes.addNewDrawnMutation(m2,5000);
 	p1.genomes.addNewDrawnMutation(m3,15000);
 	p1.genomes.addNewDrawnMutation(m4,25000);
-    sim.outputFull(filepath="burn_in.txt");
 }
 $pulse_generation{
 	p2.setMigrationRates(p1,$pulse_percentage);
