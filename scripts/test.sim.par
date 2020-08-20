@@ -1,0 +1,13 @@
+parameter	value
+mutation_rate	3.8e-10
+recombination_rate	3.133483e-06
+population_size	1000
+max_generations	320000
+output_sim	test.sim.out
+pulse_generation	268157
+pulse_generation_plus_one	268158
+pulse_percentage	0.2843962346301684
+factor	10000
+selfing_rate	0.7647214872325534
+cloning_rate	0.23527351276744662
+burnin	8000
