@@ -2,13 +2,13 @@
 initialize() { 
 defineConstant("factor", $factor);
 //factor = 10000;
-defineConstant("selfing_rate", $selfing_rate);
 mutation_rate = $mutation_rate * factor;
-recombination_rate = $recombination_rate * factor;
-imb = selfing_rate / (2- selfing_rate);
-recombination_rate = recombination_rate * ( 1- selfing_rate);
-initializeMutationRate(mutation_rate/imb);
+//recombination_rate = $recombination_rate *factor;
+recombination_rate = $recombination_rate * factor; 
+initializeMutationRate(0);
+initializeTreeSeq(simplificationRatio=INF);
 initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+defineConstant("selfing_rate", $selfing_rate);
 defineConstant("cloning_rate", $cloning_rate);
 // gal7
 initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
@@ -45,14 +45,15 @@ late(){
 }
 // create a population of 500 individuals
 1 late(){
+    print(asInteger(10e6/factor));
 	sim.addSubpop("p1", asInteger(10e6/factor));
-	sim.addSubpop("p2", asInteger(10e6/factor));
+	//sim.addSubpop("p2", asInteger(10e6/factor));
 }
 $burnin late(){ 
 	p1.setSelfingRate(selfing_rate);
-	p2.setSelfingRate(selfing_rate);
+	//p2.setSelfingRate(selfing_rate);
 	p1.setCloningRate(cloning_rate);
-	p2.setCloningRate(cloning_rate);
+	//p2.setCloningRate(cloning_rate);
 	//p1.genomes.addNewDrawnMutation(m2,10000);
 	//p1.genomes.addNewDrawnMutation(m3,30000);
 	//p1.genomes.addNewDrawnMutation(m4,50000);
@@ -70,5 +71,5 @@ $pulse_generation_plus_one{
 }
 
 // output samples of 10 genomes periodically, all fixed mutations at end
-$max_generations{ sim.outputFull(filePath="$output_sim");
+$max_generations{ sim.treeSeqOutput(filePath="$output_sim");
  }

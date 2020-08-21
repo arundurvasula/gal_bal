@@ -1,0 +1,9 @@
+/bin/sh: line 1:  8002 Killed                  slim -s 0 sims/41.slim > sims/41.log 2>&1
+Traceback (most recent call last):
+  File "simulation_template.py", line 93, in <module>
+    main()
+  File "simulation_template.py", line 87, in main
+    subprocess.check_call("slim -s 0 {slim_output} > {slim_log} 2>&1".format(slim_output=slim_output,slim_log=slim_log),shell=True) 
+  File "/u/home/s/smilefre/project-kruglyak/anaconda3/envs/covidngs/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command 'slim -s 0 sims/41.slim > sims/41.log 2>&1' returned non-zero exit status 137.

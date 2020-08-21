@@ -8,4 +8,4 @@
 #$ -o logs/
 SIM_NUMBER=${SGE_TASK_ID}
 OUTPUT_SIM=sims/$SIM_NUMBER
-python simulation_template.py --output-sim $OUTPUT_SIM
+python simulation_template.py --output-sim $OUTPUT_SIM -f 50000

@@ -1,0 +1,166 @@
+// set up a simple neutral simulation
+initialize() { 
+defineConstant("factor", $factor);
+//factor = 10000;
+defineConstant("selfing_rate", $selfing_rate);
+mutation_rate = $mutation_rate * factor;
+imb = selfing_rate / (2- selfing_rate);
+recombination_rate = $recombination_rate * factor;
+recombination_rate = recombination_rate * ( 1- selfing_rate);
+initializeMutationRate(mutation_rate/imb);
+initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+defineConstant("cloning_rate", $cloning_rate);
+// gal7
+initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m3", 0.5, "f", 0.0); // beneficial in p2 
+initializeGenomicElementType("g1", c(m1), 1.0);
+initializeGenomicElementType("g2", c(m1), 1.0); 
+initializeGenomicElementType("g3", c(m1), 1.0); 
+//. pgm1
+initializeMutationType("m4", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m5", 0.5, "f", 0.0); // beneficial in p2 
+// gal2
+initializeMutationType("m6", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m7", 0.5, "f", 0.0); // beneficial in p2  
+m2.convertToSubstitution = F;
+m3.convertToSubstitution = F;
+m4.convertToSubstitution = F;
+//m5.convertToSubstitution = F;
+//m6.convertToSubstitution = F;
+//m7.convertToSubstitution = F;
+//m2.convertToSubstitution = F;
+//m3.convertToSubstitution = F;
+initializeGenomicElement(g1, 0, 10000); 
+initializeGenomicElement(g2, 10001, 20000); 
+initializeGenomicElement(g3, 20001, 30000); 
+print(mutation_rate);
+print(recombination_rate);
+rates = c(rep(c(recombination_rate, 0.5),2),recombination_rate);
+ends = (repEach(c(5000,15000,25000) + 5000,2) +  rep(c(0,1), 3))[0:4];
+initializeRecombinationRate(rates,ends);
+defineConstant("migration_rate",$migration_rate);
+defineConstant("negative_epistatis",$negative_epistasis);
+defineConstant("ref_advantage",$ref_advantage*factor);
+defineConstant("alt_advantage",$alt_advantage*factor); 
+defineConstant("population_size",$population_size/factor);
+//selfing_rate = 1-1/1000;
+} 
+late(){
+	print(sim.generation);
+}
+// create a population of 500 individuals
+1 late(){
+    // split the population.
+	sim.addSubpop("p1", asInteger(10e6/factor/2));
+	sim.addSubpop("p2", asInteger(10e6/factor/2));
+    p1.setMigrationRates(p2,migration_rate);
+    p2.setMigrationRates(p1,migration_rate);
+}
+$burnin late(){ 
+//	p1.setSelfingRate(selfing_rate);
+//	p2.setSelfingRate(selfing_rate);
+	p1.setCloningRate(cloning_rate);
+	p2.setCloningRate(cloning_rate);
+	//p1.genomes.addNewDrawnMutation(m2,10000);
+	//p1.genomes.addNewDrawnMutation(m3,30000);
+	//p1.genomes.addNewDrawnMutation(m4,50000);
+	//p1.add
+	// Population 1 ()
+    p1.genomes.addNewDrawnMutation(m2,5000);
+	p1.genomes.addNewDrawnMutation(m3,15000);
+	p1.genomes.addNewDrawnMutation(m4,25000);
+    // Population 2 ()
+	p2.genomes.addNewDrawnMutation(m5,5000);
+	p2.genomes.addNewDrawnMutation(m6,15000);
+	p2.genomes.addNewDrawnMutation(m7,25000);
+    sim.outputFull(filePath="$output_sim.neutral");
+}
+//### In a diploid given the high selifing rate what do we want to do ### 
+//### 
+
+// p2 == cheeese
+// p1 == other
+// m2 = gal1 ref
+// m3 = pgm1 ref
+// m4 = gal2 ref 
+
+
+// m5 = gal1 alt 
+// m6 = pgm1 alt
+// m7 = gal2 alt 
+fitness(m2,p1){
+    if(genome1.countOfMutationsOfType(m3)){
+        if(genome1.countOfMutationsOfType(m4)){
+            return(ref_advantage);
+        }
+    }
+    return 1.0;
+}
+// cheese p2 = cheese
+fitness(m2,p2){
+    return 1.0;
+
+}
+fitness(m3,p1){
+    if(genome1.countOfMutationsOfType(m2)){
+        if(genome1.countOfMutationsOfType(m4)){
+            return(ref_advantage);
+        }
+    }
+    return 1.0;
+
+}
+fitness(m3,p2){
+    return 1.0;
+
+}
+fitness(m4,p1){
+    if(genome1.countOfMutationsOfType(m2)){
+        if(genome1.countOfMutationsOfType(m3)){
+            return(ref_advantage);
+        }
+    }
+    return 1.0;
+
+}
+fitness(m4,p2){
+   return 1.0;
+}
+fitness(m5,p1){
+    return 1.0;
+
+}
+fitness(m5,p2){
+    if(genome1.countOfMutationsOfType(m6)){
+        if(genome1.countOfMutationsOfType(m7)){
+            return(alt_advantage);
+        }
+    }
+    return 1.0;
+
+}
+fitness(m6,p1){
+    return 1.0;
+}
+fitness(m6,p2){
+    if(genome1.countOfMutationsOfType(m5)){
+        if(genome1.countOfMutationsOfType(m7)){
+            return(alt_advantage);
+        }
+    }
+    return 1.0;
+}
+fitness(m7,p1){
+    return 1.0;
+}
+fitness(m7,p2){
+    if(genome1.countOfMutationsOfType(m5)){
+        if(genome1.countOfMutationsOfType(m6)){
+            return(alt_advantage);
+        }
+    }
+    return 1.0;
+}
+// output samples of 10 genomes periodically, all fixed mutations at end
+$max_generations{ sim.outputFull(filePath="$output_sim");
+ }
