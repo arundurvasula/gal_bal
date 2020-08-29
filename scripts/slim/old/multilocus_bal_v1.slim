@@ -1,15 +1,15 @@
 // set up a simple neutral simulation
 initialize() { 
-defineConstant("factor", $factor);
+defineConstant("factor", 50000);
 //factor = 10000;
-defineConstant("selfing_rate", $selfing_rate);
-mutation_rate = $mutation_rate * factor;
+defineConstant("selfing_rate", 0.999);
+mutation_rate = 3.8e-10 * factor;
 //imb = selfing_rate / (2- selfing_rate);
-recombination_rate = $recombination_rate * factor;
+recombination_rate = 3.133483e-06 * factor;
 recombination_rate = recombination_rate * ( 1- selfing_rate);
 initializeMutationRate(mutation_rate);
 initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
-defineConstant("cloning_rate", $cloning_rate);
+defineConstant("cloning_rate", 0.99);
 // gal7
 initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
 initializeMutationType("m3", 0.5, "f", 0.0); // beneficial in p2 
@@ -39,15 +39,18 @@ rates = c(rep(c(recombination_rate, 0.5),2),recombination_rate);
 ends = (repEach(c(5000,15000,25000) + 5000,2) +  rep(c(0,1), 3))[0:4];
 initializeRecombinationRate(rates,ends);
 defineConstant("migration_rate",0.5);
-ref_dominance = $ref_dominance; 
+defineConstant("negative_epistatis",1.0);
+ref_dominance = 0.98;
 defineConstant("ref_het",1 + 0.1 * ref_dominance * factor);
-defineConstant("ref_advantage",1 + $ref_advantage *factor);
+defineConstant("ref_advantage",1 + 0.1*factor);
 alt_dominance = 0.0001;
-alt_dominance = $alt_dominance;
+//if( .alt_dominance * factor < 1)
+defineConstant("alt_advantage",1 + 0.1  *factor); 
 defineConstant("alt_het",1 + 0.1 * alt_dominance *factor);
-defineConstant("alt_advantage",1 + $alt_advantage *factor); 
-defineConstant("population_size",$population_size/factor);
-defineConstant("mitotic_recomb_rate",$mitotic_recomb_rate);
+print(0.00011715560134176056*factor);
+print(ref_advantage);
+defineConstant("population_size",10000000.0/factor);
+//selfing_rate = 1-1/1000;
 } 
 late(){
 	if(sim.generation % 100 == 0){
@@ -57,8 +60,8 @@ late(){
 // create a population of 500 individuals
 1 late(){
     // split the population.
-	sim.addSubpop("p1", asInteger(population_size/2));
-	sim.addSubpop("p2", asInteger(population_size/2));
+	sim.addSubpop("p1", asInteger(10e6/factor/2));
+	sim.addSubpop("p2", asInteger(10e6/factor/2));
    p1.setMigrationRates(p2,migration_rate);
    p2.setMigrationRates(p1,migration_rate);
    //print(cloning_rate / cloning_rate/8 * 7);
@@ -76,22 +79,31 @@ late(){
 
 
 }
-$burnin late(){ 
-	p1.setSelfingRate(cloning_rate  * mitotic_recomb_rate)	;
-	p2.setSelfingRate(cloning_rate * mitotic_recomb_rate);
+1600 late(){ 
+// allow for some homozygosite 
+//	s_rate = 1 - (1- cloning_rate)/(1- cloning_rate/8*7);
+//	print(s_rate);
+	p1.setSelfingRate(cloning_rate / 10  * 1)	;
+	p2.setSelfingRate(cloning_rate / 10 * 1);
 	// to ensure hets get recombined ... ... ... ... .. //
-	p1.setCloningRate(cloning_rate * ( 1- mitotic_recomb_rate));
-	p2.setCloningRate(cloning_rate * (1- mitotic_recomb_rate));
+	p1.setCloningRate(cloning_rate /10  *9);
+	p2.setCloningRate(cloning_rate/ 10  * 9);
+	//p1.genomes.addNewDrawnMutation(m2,10000);
+	//p1.genomes.addNewDrawnMutation(m3,30000);
+	//p1.genomes.addNewDrawnMutation(m4,50000);
+	//p1.add
+	// Population 1 ()
     p1.genomes.addNewDrawnMutation(m2,5000);
-    p1.genomes.addNewDrawnMutation(m3,15000);
-    p1.genomes.addNewDrawnMutation(m4,25000);
+	p1.genomes.addNewDrawnMutation(m3,15000);
+	p1.genomes.addNewDrawnMutation(m4,25000);
     // Population 2 ()
-    p2.genomes.addNewDrawnMutation(m5,5000);
-    p2.genomes.addNewDrawnMutation(m6,15000);
-    p2.genomes.addNewDrawnMutation(m7,25000);
-
+	p2.genomes.addNewDrawnMutation(m5,5000);
+	p2.genomes.addNewDrawnMutation(m6,15000);
+	p2.genomes.addNewDrawnMutation(m7,25000);
+    //sim.outputFull(filePath="test/test9.out.neutral");
 }
 //### In a diploid given the high selifing rate what do we want to do ### 
+//### 
 
 // p2 == cheeese
 // p1 == other
@@ -226,5 +238,5 @@ if(genome1.countOfMutationsOfType(m6) & genome2.countOfMutationsOfType(m6)){
     return 1.0;
 }
 // output samples of 10 genomes periodically, all fixed mutations at end
-$max_generations late(){ sim.outputFull(filePath="$output_sim");
+63100 late(){ sim.outputFull(filePath="test9.out");
  }

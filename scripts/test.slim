@@ -1,15 +1,15 @@
 // set up a simple neutral simulation
 initialize() { 
-defineConstant("factor", $factor);
+defineConstant("factor", 50000);
 //factor = 10000;
-defineConstant("selfing_rate", $selfing_rate);
-mutation_rate = $mutation_rate * factor;
+defineConstant("selfing_rate", 0.9993254937680964);
+mutation_rate = 3.8e-10 * factor;
 //imb = selfing_rate / (2- selfing_rate);
-recombination_rate = $recombination_rate * factor;
+recombination_rate = 3.133483e-06 * factor;
 recombination_rate = recombination_rate * ( 1- selfing_rate);
 initializeMutationRate(mutation_rate);
 initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
-defineConstant("cloning_rate", $cloning_rate);
+defineConstant("cloning_rate", 0.9703486801840853);
 // gal7
 initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
 initializeMutationType("m3", 0.5, "f", 0.0); // beneficial in p2 
@@ -39,15 +39,15 @@ rates = c(rep(c(recombination_rate, 0.5),2),recombination_rate);
 ends = (repEach(c(5000,15000,25000) + 5000,2) +  rep(c(0,1), 3))[0:4];
 initializeRecombinationRate(rates,ends);
 defineConstant("migration_rate",0.5);
-ref_dominance = $ref_dominance; 
+ref_dominance = 0.98; 
 defineConstant("ref_het",1 + 0.1 * ref_dominance * factor);
-defineConstant("ref_advantage",1 + $ref_advantage *factor);
+defineConstant("ref_advantage",1 + 0.011077274055724865 *factor);
 alt_dominance = 0.0001;
-alt_dominance = $alt_dominance;
+alt_dominance = 0.0001;
 defineConstant("alt_het",1 + 0.1 * alt_dominance *factor);
-defineConstant("alt_advantage",1 + $alt_advantage *factor); 
-defineConstant("population_size",$population_size/factor);
-defineConstant("mitotic_recomb_rate",$mitotic_recomb_rate);
+defineConstant("alt_advantage",1 + 0.011192186226785484 *factor); 
+defineConstant("population_size",10000000/factor);
+defineConstant("mitotic_recomb_rate",0.021270837224892394);
 } 
 late(){
 	if(sim.generation % 100 == 0){
@@ -76,7 +76,7 @@ late(){
 
 
 }
-$burnin late(){ 
+1600 late(){ 
 	p1.setSelfingRate(cloning_rate  * mitotic_recomb_rate)	;
 	p2.setSelfingRate(cloning_rate * mitotic_recomb_rate);
 	// to ensure hets get recombined ... ... ... ... .. //
@@ -226,5 +226,5 @@ if(genome1.countOfMutationsOfType(m6) & genome2.countOfMutationsOfType(m6)){
     return 1.0;
 }
 // output samples of 10 genomes periodically, all fixed mutations at end
-$max_generations late(){ sim.outputFull(filePath="$output_sim");
+65600 late(){ sim.outputFull(filePath="test.out.sim");
  }
