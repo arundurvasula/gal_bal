@@ -1,0 +1,85 @@
+// set up a simple neutral simulation
+initialize() { 
+defineConstant("factor", $factor);
+//factor = 10000;
+defineConstant("selfing_rate", $selfing_rate);
+mutation_rate = $mutation_rate * factor;
+recombination_rate = $recombination_rate * factor;
+imb = selfing_rate / (2- selfing_rate);
+recombination_rate = recombination_rate * ( 1- selfing_rate);
+initializeMutationRate(mutation_rate/imb);
+initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
+defineConstant("cloning_rate", $cloning_rate);
+// gal7
+initializeMutationType("m2", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m3", 0.5, "f", 0.0); // beneficial in p2 
+initializeGenomicElementType("g1", c(m1), 1.0);
+initializeGenomicElementType("g2", c(m1), 1.0); 
+initializeGenomicElementType("g3", c(m1), 1.0); 
+//. pgm1
+initializeMutationType("m4", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m5", 0.5, "f", 0.0); // beneficial in p2 
+// gal2
+initializeMutationType("m6", 0.5, "f", 0.0); // beneficial in p1 
+initializeMutationType("m7", 0.5, "f", 0.0); // beneficial in p2  
+m2.convertToSubstitution = F;
+m3.convertToSubstitution = F;
+m4.convertToSubstitution = F;
+//m5.convertToSubstitution = F;
+//m6.convertToSubstitution = F;
+//m7.convertToSubstitution = F;
+//m2.convertToSubstitution = F;
+//m3.convertToSubstitution = F;
+initializeGenomicElement(g1, 0, 10000); 
+initializeGenomicElement(g2, 10001, 20000); 
+initializeGenomicElement(g3, 20001, 30000); 
+print(mutation_rate);
+print(recombination_rate);
+rates = c(rep(c(recombination_rate, 0.5),2),recombination_rate);
+ends = (repEach(c(5000,15000,25000) + 5000,2) +  rep(c(0,1), 3))[0:4];
+initializeRecombinationRate(rates,ends);
+defineConstant("population_size",$population_size/factor);
+defineConstant("mitotic_recomb_rate",$mitotic_recomb_rate);
+defineConstant("migration_rate",0.5);
+//selfing_rate = 1-1/1000;
+} 
+late(){
+	print(sim.generation);
+}
+// create a population of 500 individuals
+1 late(){
+	sim.addSubpop("p1", asInteger(10e6/factor)/2);
+    sim.addSubpop("p2", asInteger(10e6/factor)/2)
+	sim.addSubpop("p3", asInteger(10e6/factor));
+    p1.setMigrationRates(p2,migration_rate);
+    p2.setMigrationRates(p1,migration_rate);
+}
+$burnin late(){ 
+	p1.setSelfingRate(cloning_rate  * mitotic_recomb_rate)	;
+	p2.setSelfingRate(cloning_rate * mitotic_recomb_rate);
+	// to ensure hets get recombined ... ... ... ... .. //
+	p1.setCloningRate(cloning_rate * ( 1- mitotic_recomb_rate));
+	p2.setCloningRate(cloning_rate * (1- mitotic_recomb_rate));
+	p1.genomes.addNewDrawnMutation(m2,5000);
+	p1.genomes.addNewDrawnMutation(m3,10000);
+	p1.genomes.addNewDrawnMutation(m4,15000);
+	p2.genomes.addNewDrawnMutation(m2,5000);
+	p2.genomes.addNewDrawnMutation(m3,10000);
+	p2.genomes.addNewDrawnMutation(m4,15000);
+	// ref advantage 
+	p3.genomes.addNewDrawnMutation(m5,5000);
+	p3.genomes.addNewDrawnMutation(m6,15000);
+	p3.genomes.addNewDrawnMutation(m7,25000);
+}
+$pulse_generation{
+	p3.setMigrationRates(p1,$pulse_percentage);
+	
+}
+$pulse_generation_plus_one{
+	p3.setMigrationRates(p1,0);
+    p3.setPopulationSize(0);
+}
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+$max_generations{ sim.outputFull(filePath="$output_sim");
+ }

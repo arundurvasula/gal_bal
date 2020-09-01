@@ -61,7 +61,6 @@ def get_parameters(sim_type, out_sim, factor):
     mapping["max_generations"] = int(TOTAL_GENERATIONS/factor) + mapping["burnin"]
     cloning = random.uniform(1-1/10,1-1/2000) 
     selfing = 1 - TOTAL_OUTCROSSING /(1-cloning) 
-
     #### 
     mapping["selfing_rate"]   = selfing
     mapping["cloning_rate"] = cloning 
