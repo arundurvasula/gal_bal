@@ -25,9 +25,9 @@ initializeMutationType("m7", 0.5, "f", 0.0); // beneficial in p2
 m2.convertToSubstitution = F;
 m3.convertToSubstitution = F;
 m4.convertToSubstitution = F;
-//m5.convertToSubstitution = F;
-//m6.convertToSubstitution = F;
-//m7.convertToSubstitution = F;
+m5.convertToSubstitution = F;
+m6.convertToSubstitution = F;
+m7.convertToSubstitution = F;
 //m2.convertToSubstitution = F;
 //m3.convertToSubstitution = F;
 initializeGenomicElement(g1, 0, 10000); 
@@ -44,13 +44,15 @@ defineConstant("migration_rate",0.5);
 //selfing_rate = 1-1/1000;
 } 
 late(){
+	if(sim.generation % 100 == 0){
 	print(sim.generation);
+}
 }
 // create a population of 500 individuals
 1 late(){
-	sim.addSubpop("p1", asInteger(10e6/factor)/2);
-    sim.addSubpop("p2", asInteger(10e6/factor)/2)
-	sim.addSubpop("p3", asInteger(10e6/factor));
+	sim.addSubpop("p1", asInteger(population_size/2));
+    sim.addSubpop("p2", asInteger(population_size/2));
+	sim.addSubpop("p3", asInteger(population_size));
     p1.setMigrationRates(p2,migration_rate);
     p2.setMigrationRates(p1,migration_rate);
 }
@@ -72,14 +74,15 @@ $burnin late(){
 	p3.genomes.addNewDrawnMutation(m7,25000);
 }
 $pulse_generation{
-	p3.setMigrationRates(p1,$pulse_percentage);
-	
+	p1.setMigrationRates(p3,$pulse_percentage);
+    p1.setMigrationRates(p2,0.0);
+    p2.setMigrationRates(p1,0.0);
 }
 $pulse_generation_plus_one{
-	p3.setMigrationRates(p1,0);
-    p3.setPopulationSize(0);
+	p1.setMigrationRates(p3,0);
+    p3.setSubpopulationSize(0);
 }
 
 // output samples of 10 genomes periodically, all fixed mutations at end
-$max_generations{ sim.outputFull(filePath="$output_sim");
+$max_generations late(){ sim.outputFull(filePath="$output_sim");
  }

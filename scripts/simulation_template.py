@@ -54,7 +54,7 @@ def get_parameters(sim_type, out_sim, factor):
     mapping["output_par"] = out_sim + ".par"
     pulse =int(TOTAL_GENERATIONS/factor -  random.randint(int(1/factor)+ 1,PULSE_GENERATION_MIN/factor))
    # pulse_percentage = random.randint(1,100e7/factor)
-    pulse_percentage = random.uniform(.01,.5)
+    pulse_percentage = random.uniform(.5,1.0)
     mapping["pulse_generation"] = pulse
     mapping["pulse_percentage"] = pulse_percentage
     mapping["pulse_generation_plus_one"] = mapping["pulse_generation"] + 1 
@@ -66,9 +66,9 @@ def get_parameters(sim_type, out_sim, factor):
     mapping["cloning_rate"] = cloning 
 
     ### Mitotic recombination
-    mapping["alt_advantage"] = random.uniform(2e-4,2e-2)
-    mapping["ref_advantage"] = random.uniform(2e-4,2e-2)
-    mapping["mitotic_recomb_rate"] = random.uniform(1/1000.0,1/10.0)
+    mapping["alt_advantage"] = random.uniform(2e-4,3e-1)
+    mapping["ref_advantage"] = random.uniform(2e-4,3e-1)
+    mapping["mitotic_recomb_rate"] = random.uniform(0,1/10.0)
     mapping["factor"] = factor
     mapping["alt_dominance"] = ALT_DOMINANCE
     mapping["ref_dominance"] = REF_DOMINANCE 
@@ -112,7 +112,7 @@ def main():
     else:
         mapping = get_parameters(simulation_type,output_sim + ".out", factor)
     if simulation_type == "introgression":
-        slim_template = Template(open("slim/introgression.slim","r").read())
+        slim_template = Template(open("slim/introgression_v1.slim","r").read())
     elif simulation_type == "balancing_selection":
         slim_template = Template(open("slim/multilocus_bal_v1.slim","r").read())
     elif simulation_type == "balancing_selection_introgression":

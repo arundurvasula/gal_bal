@@ -1,3 +1,7 @@
+sim_output_intro/*
+sims_intro/*
 sims/*
 logs/*
 test/*
+sim_output/*
+factor_out/*

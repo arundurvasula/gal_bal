@@ -227,7 +227,7 @@ read_slim <- function(file_path,
 library(arrangements)
 calculate_eld_gal = function(genotypes, genomes_in,mac){
   all_p = permutations(n=3,k=3,replace = T) - 1
-  y = genomes_in$Mutations[genomes_in$Mutations$type != "m1",]$colID
+  y = genomes_in$Mutations[genomes_in$Mutations$type %in% c("m2","m3","m4"),]$colID
   if(any(mac[y] == 0)){
     print("LOST")
   }else{
