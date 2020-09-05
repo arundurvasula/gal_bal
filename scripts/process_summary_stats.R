@@ -34,15 +34,14 @@ tile_genome = GRanges(seqnames="chr1",IRanges(c(seq(1,5000-window_width+ 1,by=wi
 # m2, m3,m4,m5,m6,m7.
 ### Must be missing some alleles
 genomes_in2 = read_slim(input_sim,recode_recurrent = F,keep_maf = 1)
+genomes_in2$Haplotypes = as.matrix(genomes_in2$Haplotypes)
 genotypes = t(sapply(1:(nrow(genomes_in2$Haplotypes)/2),function(x) {genomes_in2$Haplotypes[(2*x-1),] +genomes_in2$Haplotypes[(2*x),]}))
-print(dim(genotypes))
 ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type) %>% select(colID)
 mac = apply(genomes_in2$Haplotypes,2,function(x){sum(x)})
 #genotypes = genomes_in2$Haplotypes[(nrow(genomes_in2$Haplotypes)/2 +1):nrow(genomes_in2$Haplotypes),]
 ###
 ###
 eld = calculate_eld_gal(genotypes, genomes_in2,mac)
-print(eld)
 ### GAL statistics #### 
 ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type) %>% select(colID)
 mutation_df = genomes_in2$Mutations[ids$colID,]
@@ -78,10 +77,8 @@ windowed_ds$div = diversity_all
 windowed_ds$div1 = diversity1
 windowed_ds$div2 =  diversity2
 pi_ff = tile_genome %>% group_by_overlaps(windowed_ds) %>% summarise(pi1=sum(div1)/window_width,pi2=sum(div2)/window_width)
-x = genomes_in2$Haplotypes[m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]
-]
-y = genomes_in2$Haplotypes[!m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]
-]
+x = as.matrix(genomes_in2$Haplotypes[m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]])
+y = as.matrix(genomes_in2$Haplotypes[!m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]])
 rm_idx_v1 = genomes_in2$Mutations$colID[genomes_in2$Mutations$type == "m1"]
 diversity_between_groups =sapply(1:ncol(y),function(z){
     one = sum(x[,z] == 1) 

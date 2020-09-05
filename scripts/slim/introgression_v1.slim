@@ -81,6 +81,8 @@ $pulse_generation{
 $pulse_generation_plus_one{
 	p1.setMigrationRates(p3,0);
     p3.setSubpopulationSize(0);
+    p1.setMigrationRates(p2,migration_rate);
+    p2.setMigrationRates(p1,migration_rate);
 }
 
 // output samples of 10 genomes periodically, all fixed mutations at end

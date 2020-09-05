@@ -54,6 +54,7 @@ def get_parameters(sim_type, out_sim, factor):
     mapping["output_par"] = out_sim + ".par"
     pulse =int(TOTAL_GENERATIONS/factor -  random.randint(int(1/factor)+ 1,PULSE_GENERATION_MIN/factor))
    # pulse_percentage = random.randint(1,100e7/factor)
+   # TODO: Simulate the migration rate also
     pulse_percentage = random.uniform(.5,1.0)
     mapping["pulse_generation"] = pulse
     mapping["pulse_percentage"] = pulse_percentage
@@ -101,12 +102,19 @@ def main():
     parser.add_argument("-o","--output-sim",dest="output_sim",default="test.sim",required=True)
     parser.add_argument("-p","--parameter-file",dest="parameter_file",help="Runs with a parameter file")
     parser.add_argument("-n","--num-sims",dest="number_of_sims",help="Number of simulations")
+    parser.add_argument("-r","--random",dest="random",help="Random input",action="store_true",default=False)
     args = parser.parse_args()
     simulation_type = args.simulation_type
     template = args.template_in
     factor = int(args.factor)
     output_sim= args.output_sim
     tree_sequence = args.tree_sequence
+
+    random = args.random
+    import random
+    if random:
+        simulation_type = random.choice(["introgression","balancing_selection","balancing_selection_introgression"])
+        print(simulation_type)
     if args.parameter_file is not None:
         mapping = read_parameter_file(args.parameter_file, factor, output_sim + ".out")
     else:
@@ -116,7 +124,7 @@ def main():
     elif simulation_type == "balancing_selection":
         slim_template = Template(open("slim/multilocus_bal_v1.slim","r").read())
     elif simulation_type == "balancing_selection_introgression":
-        slim_template = Template(open("slim/balancing_selection_introgression.slim","r").read())
+        slim_template = Template(open("slim/multilocus_bal_intro_v1.slim","r").read())
     with open(output_sim +".par","w") as  out_f:
         out_f.write("parameter\tvalue\n")
         for key, value in mapping.items():
