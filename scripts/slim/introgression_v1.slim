@@ -7,6 +7,7 @@ mutation_rate = $mutation_rate * factor;
 recombination_rate = $recombination_rate * factor;
 imb = selfing_rate / (2- selfing_rate);
 recombination_rate = recombination_rate * ( 1- selfing_rate);
+
 initializeMutationRate(mutation_rate/imb);
 initializeMutationType("m1", 0.5, "f", 0.0); // neutral 
 defineConstant("cloning_rate", $cloning_rate);

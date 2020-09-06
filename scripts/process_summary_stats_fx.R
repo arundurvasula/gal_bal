@@ -228,8 +228,14 @@ library(arrangements)
 calculate_eld_gal = function(genotypes, genomes_in,mac){
   all_p = permutations(n=3,k=3,replace = T) - 1
   y = genomes_in$Mutations[genomes_in$Mutations$type %in% c("m2","m3","m4"),]$colID
+  print(y)
+  if(length(y) != 3){
+    print("LOST");
+    return(1);
+  }
   if(any(mac[y] == 0)){
-    print("LOST")
+    print("LOST");
+    return(1);
   }else{
     prob_all = apply(all_p, 1,function(x){sum(genotypes[,y[1]] == x[1] & genotypes[,y[2]] == x[2] & genotypes[,y[3]] == x[3])/nrow(genotypes)})
     prob_null = apply(all_p, 1,function(x){sum(genotypes[,y[1]] == x[1])/nrow(genotypes) * sum(genotypes[,y[2]] == x[2])/nrow(genotypes) * sum(genotypes[,y[3]] ==x[3])/nrow(genotypes)})

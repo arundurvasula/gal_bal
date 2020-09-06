@@ -54,7 +54,9 @@ diversity_all = apply(genomes_in2$Haplotypes[,-ids$colID],2,diversity_pi)
     windowed_ds$div = diversity_all
     pi_between_df = tile_genome %>% group_by_overlaps(windowed_ds) %>% summarise(pi_all = sum(div)/window_width) %>% as.data.frame
     input_base = basename(input_sim)
-    mutation_list = list(mutation_df=mutation_df,pi_between_df=pi_between_df)    
+    #mutation_list = list(mutation_df=mutation_df,pi_between_df=pi_between_df)    
+    out_df = data.frame()
+    mutation_list = list(out_slopes=out_df, pi_between_df=data.frame(), mutation_df=mutation_df,site_frequency_spectrum=mac,parameter_in=parameter_in)
     out_slope_summary_stats = paste(output_folder,"/", paste(input_base,".rds",sep=""),sep="")
     saveRDS(mutation_list, file=out_slope_summary_stats)
     quit()
@@ -70,6 +72,7 @@ diversity_all = apply(genomes_in2$Haplotypes[,-ids$colID],2,diversity_pi)
 #pi = tile_genome %>% group_by_overlaps(windowed_ds) %>% summarise(pi=sum(div)/window_width)
 
 m1  = (genomes_in2$Haplotypes[,ids$colID[1]] == 1)
+### M1 and m2 and m3 ###  
 diversity1 = apply(genomes_in2$Haplotypes[m1,-ids$colID],2,diversity_pi)
 diversity2 = apply(genomes_in2$Haplotypes[!m1,-ids$colID],2,diversity_pi)
 windowed_ds = GRanges(seqnames="chr1",ranges=IRanges(genomes_in2$Mutations$position[-ids$colID],end=(genomes_in2$Mutations$position[-ids$colID])))
@@ -109,9 +112,10 @@ for (i in unique(df_out$query)){
     df2 = df_out[df_out$query == i,]
     df2$row_number = 1:nrow(df2)
     m1 = ((lm(log(pi_between)~ row_number,data=df2)))
+    m1_resid = residuals(m1)^2
     intercept= (summary(m1)$coef[1,1])
     slope = (summary(m1)$coef[2,1])
-    max_ds = max(df2$pi_between)
+    max_ds = (df2$pi_between[length(df2$pi_between)])
     p = data.frame(row_number=max(df2$row_number))
     predict1 = (predict(m1,p))
     #print(exp(predict1))

@@ -39,7 +39,7 @@ TOTAL_GENERATIONS=3.2e9
 ALT_DOMINANCE = 0.0001
 REF_DOMINANCE = 0.98
 
-PULSE_GENERATION_MIN=100e7
+PULSE_GENERATION_MIN=5e7
 
 def get_parameters(sim_type, out_sim, factor):
 
@@ -56,7 +56,7 @@ def get_parameters(sim_type, out_sim, factor):
    # pulse_percentage = random.randint(1,100e7/factor)
    # TODO: Simulate the migration rate also
     pulse_percentage = random.uniform(.5,1.0)
-    mapping["pulse_generation"] = pulse
+    mapping["pulse_generation"] = pulse + mapping["burnin"]
     mapping["pulse_percentage"] = pulse_percentage
     mapping["pulse_generation_plus_one"] = mapping["pulse_generation"] + 1 
     mapping["max_generations"] = int(TOTAL_GENERATIONS/factor) + mapping["burnin"]
@@ -103,6 +103,7 @@ def main():
     parser.add_argument("-p","--parameter-file",dest="parameter_file",help="Runs with a parameter file")
     parser.add_argument("-n","--num-sims",dest="number_of_sims",help="Number of simulations")
     parser.add_argument("-r","--random",dest="random",help="Random input",action="store_true",default=False)
+    #parser.add_argument("--pulse-generation-min",dest="
     args = parser.parse_args()
     simulation_type = args.simulation_type
     template = args.template_in
@@ -110,9 +111,9 @@ def main():
     output_sim= args.output_sim
     tree_sequence = args.tree_sequence
 
-    random = args.random
+    random_in = args.random
     import random
-    if random:
+    if random_in:
         simulation_type = random.choice(["introgression","balancing_selection","balancing_selection_introgression"])
         print(simulation_type)
     if args.parameter_file is not None:
