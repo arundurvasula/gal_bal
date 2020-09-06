@@ -15,3 +15,6 @@ source activate balancing_selection
 mkdir -p sim_output_intro3
 /u/home/s/smilefre/project-kruglyak/anaconda3/bin/python simulation_template.py --output-sim $OUTPUT_SIM -f 50000 --simulation-type balancing_selection_introgression -r 
 Rscript process_summary_stats.R  --input-sim ${OUTPUT_SIM}.out.sim  --parameter-file ${OUTPUT_SIM}.par -f sim_output_intro3
+rm ${OUTPUT_SIM}.out.sim
+rm ${OUTPUT_SIM}.par
+rm ${OUTPUT_SIM}.log
