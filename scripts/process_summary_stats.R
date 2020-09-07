@@ -93,20 +93,20 @@ set3 = which(not_m1_df$position >= 20000 & not_m1_df$position <=30000)
 m2= (genomes_in2$Haplotypes[,ids$colID[1]] == 1)
 m3= (genomes_in2$Haplotypes[,ids$colID[2]] == 1)
 m4= (genomes_in2$Haplotypes[,ids$colID[3]] == 1)
-
+print(ids)
 
 idx = genomes_in2$Mutations$type == "m2"
 rm_idx_v1 = genomes_in2$Mutations$colID[genomes_in2$Mutations$type == "m1"]
 diversity_between_groups =sapply(1:ncol(haplo_matrix),function(z){
     if ( z %in% set1){
         x=haplo_matrix[m2,z]
-        y=haplo_matrix[m2,z]
+        y=haplo_matrix[!m2,z]
     }else if(z %in% set2){
         x=haplo_matrix[m3,z]
-        y=haplo_matrix[m3,z]
+        y=haplo_matrix[!m3,z]
     }else{
         x=haplo_matrix[m4,z]
-        y=haplo_matrix[m4,z]
+        y=haplo_matrix[!m4,z]
     }
     #print(x)
     one = sum(x == 1) 
