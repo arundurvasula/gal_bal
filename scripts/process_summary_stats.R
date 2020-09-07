@@ -36,14 +36,14 @@ tile_genome = GRanges(seqnames="chr1",IRanges(c(seq(1,5000-window_width+ 1,by=wi
 genomes_in2 = read_slim(input_sim,recode_recurrent = F,keep_maf = 1)
 genomes_in2$Haplotypes = as.matrix(genomes_in2$Haplotypes)
 genotypes = t(sapply(1:(nrow(genomes_in2$Haplotypes)/2),function(x) {genomes_in2$Haplotypes[(2*x-1),] +genomes_in2$Haplotypes[(2*x),]}))
-ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type) %>% select(colID)
+ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type) 
 mac = apply(genomes_in2$Haplotypes,2,function(x){sum(x)})
 #genotypes = genomes_in2$Haplotypes[(nrow(genomes_in2$Haplotypes)/2 +1):nrow(genomes_in2$Haplotypes),]
 ###
 ###
 eld = calculate_eld_gal(genotypes, genomes_in2,mac)
 ### GAL statistics #### 
-ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type) %>% select(colID)
+ids  = genomes_in2$Mutations[genomes_in2$Mutations$type != "m1",] %>% arrange(type)
 mutation_df = genomes_in2$Mutations[ids$colID,]
 mutation_df$mac = mac[ids$colID]
 mutation_df$eld = eld
@@ -80,17 +80,42 @@ windowed_ds$div = diversity_all
 windowed_ds$div1 = diversity1
 windowed_ds$div2 =  diversity2
 pi_ff = tile_genome %>% group_by_overlaps(windowed_ds) %>% summarise(pi1=sum(div1)/window_width,pi2=sum(div2)/window_width)
-x = as.matrix(genomes_in2$Haplotypes[m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]])
-y = as.matrix(genomes_in2$Haplotypes[!m1,-genomes_in2$Mutations$colID[genomes_in2$Mutations$type != "m1"]])
+# TODO: calculate the between class LD across all loci, I currently use m2 to anchor all the analyses
+# but I should use m3,m4 for their loci
+### Gotta get the idxs < 10000
+### >= 10000 & < 20000
+### >= 20000 & < 30000
+not_m1_df =genomes_in2$Mutations[genomes_in2$Mutations$type == "m1",]
+haplo_matrix  = as.matrix(genomes_in2$Haplotypes[,not_m1_df$colID])
+set1 = which(not_m1_df$position >= 0 & not_m1_df$position < 10000)
+set2 = which(not_m1_df$position >= 10000 & not_m1_df$position < 20000)
+set3 = which(not_m1_df$position >= 20000 & not_m1_df$position <=30000)
+m2= (genomes_in2$Haplotypes[,ids$colID[1]] == 1)
+m3= (genomes_in2$Haplotypes[,ids$colID[2]] == 1)
+m4= (genomes_in2$Haplotypes[,ids$colID[3]] == 1)
+
+
+idx = genomes_in2$Mutations$type == "m2"
 rm_idx_v1 = genomes_in2$Mutations$colID[genomes_in2$Mutations$type == "m1"]
-diversity_between_groups =sapply(1:ncol(y),function(z){
-    one = sum(x[,z] == 1) 
-    two = sum(y[,z] == 0) 
-    total = (nrow(x) * (nrow(y) ))
+diversity_between_groups =sapply(1:ncol(haplo_matrix),function(z){
+    if ( z %in% set1){
+        x=haplo_matrix[m2,z]
+        y=haplo_matrix[m2,z]
+    }else if(z %in% set2){
+        x=haplo_matrix[m3,z]
+        y=haplo_matrix[m3,z]
+    }else{
+        x=haplo_matrix[m4,z]
+        y=haplo_matrix[m4,z]
+    }
+    #print(x)
+    one = sum(x == 1) 
+    two = sum(y == 0) 
+    total = (length(x) * (length(y)))
     tmp_one = ((one *two) / total)
-    one = sum(x[,z] == 0) 
-    two = sum(y[,z] == 1) 
-    total = (nrow(x) * (nrow(y) ))
+    one = sum(x == 0) 
+    two = sum(y == 1) 
+    total = (length(x) * (length(y) ))
     tmp_out = tmp_one + ((one *two) / total)
     return(tmp_out)
 })
