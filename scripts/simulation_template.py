@@ -36,8 +36,8 @@ POPULATION_SIZE=10e6
 ### Total generations ###
 TOTAL_GENERATIONS=3.2e9
 
-ALT_DOMINANCE = 0.0001
-REF_DOMINANCE = 0.98
+REF_DOMINANCE = 0.0001
+ALT_DOMINANCE = 0.98
 
 PULSE_GENERATION_MIN=5e7
 
@@ -114,7 +114,7 @@ def main():
     random_in = args.random
     import random
     if random_in:
-        simulation_type = random.choice(["introgression","balancing_selection","balancing_selection_introgression"])
+        simulation_type = random.choice(["balancing_selection","balancing_selection_introgression"])
         print(simulation_type)
     if args.parameter_file is not None:
         mapping = read_parameter_file(args.parameter_file, factor, output_sim + ".out")
