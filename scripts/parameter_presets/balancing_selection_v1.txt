@@ -5,8 +5,8 @@ population_size 10e6
 total_generations 3.2e9
 alt_advantage 0.1
 ref_advantage 0.1
-alt_dominance 0.0001
-ref_dominance 0.98
+alt_dominance 0.98
+ref_dominance 0.0001
 pulse_generation 0
 pulse_percentage 0.0
 factor 50000
